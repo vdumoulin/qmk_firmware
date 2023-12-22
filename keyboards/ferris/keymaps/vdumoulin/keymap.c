@@ -8,7 +8,7 @@ enum layers {
   _MEDIA,
   _NUM,
   _SYM,
-  _FUN,
+  _FUN
 };
 
 /* Home row mods */
@@ -38,21 +38,37 @@ enum layers {
 
 /* Combos */
 enum combos {
-  SPACE_TAB_MEDIA,
-  ENTER_BACKSPACE_FUN,
-  STOP_PLAY_MUTE,
+  MEDIA_TOGGLE_COMBO,
+  SPACE_TAB_COMBO,
+  FUN_TOGGLE_COMBO,
+  ENTER_BACKSPACE_COMBO,
+  BTN1_BTN2_COMBO,
+  STOP_PLAY_COMBO,
+  ZERO_MINUS_COMBO,
+  PAREN_COMBO
 };
 
-const uint16_t PROGMEM space_tab_combo[] = {KC_SPCT, KC_TABT, COMBO_END};
-const uint16_t PROGMEM enter_backspace_combo[] = {KC_BSPT, KC_ENTT, COMBO_END};
+const uint16_t PROGMEM media_toggle_combo[] = {KC_SPCT, KC_TABT, COMBO_END};
+const uint16_t PROGMEM space_tab_combo[] = {KC_SPC, KC_TAB, COMBO_END};
+const uint16_t PROGMEM fun_toggle_combo[] = {KC_BSPT, KC_ENTT, COMBO_END};
+const uint16_t PROGMEM enter_backspace_combo[] = {KC_BSPC, KC_ENT, COMBO_END};
+const uint16_t PROGMEM btn1_btn2_combo[] = {KC_BTN1, KC_BTN2, COMBO_END};
 const uint16_t PROGMEM stop_play_combo[] = {KC_MSTP, KC_MPLY, COMBO_END};
+const uint16_t PROGMEM zero_minus_combo[] = {KC_0, KC_MINS, COMBO_END};
+const uint16_t PROGMEM paren_combo[] = {KC_RPRN, KC_UNDS, COMBO_END};
 
 combo_t key_combos[] = {
-  [SPACE_TAB_MEDIA] = COMBO(space_tab_combo, LT(_MEDIA, KC_ESC)),
-  [ENTER_BACKSPACE_FUN] = COMBO(enter_backspace_combo, LT(_FUN, KC_DEL)),
-  [STOP_PLAY_MUTE] = COMBO(enter_backspace_combo, KC_MUTE),
+  [MEDIA_TOGGLE_COMBO] = COMBO(media_toggle_combo, LT(_MEDIA, KC_ESC)),
+  [SPACE_TAB_COMBO] = COMBO(space_tab_combo, KC_APP),
+  [FUN_TOGGLE_COMBO] = COMBO(fun_toggle_combo, LT(_FUN, KC_DEL)),
+  [ENTER_BACKSPACE_COMBO] = COMBO(enter_backspace_combo, KC_DEL),
+  [BTN1_BTN2_COMBO] = COMBO(btn1_btn2_combo, KC_BTN3),
+  [STOP_PLAY_COMBO] = COMBO(stop_play_combo, KC_MUTE),
+  [ZERO_MINUS_COMBO] = COMBO(zero_minus_combo, KC_DOT),
+  [PAREN_COMBO] = COMBO(paren_combo, KC_LPRN)
 };
 
+/* Keymap */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
@@ -74,7 +90,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         XXXXXXX , KC_RALT , XXXXXXX , XXXXXXX , XXXXXXX ,      KC_INS  , KC_HOME , KC_PGDN , KC_PGUP , KC_END  ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      _______ , XXXXXXX ,      XXXXXXX , XXXXXXX
+                                      XXXXXXX , XXXXXXX ,      KC_ENT  , KC_BSPC
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_MOUSE] = LAYOUT_split_3x5_2(
@@ -85,7 +101,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         XXXXXXX , KC_RALT , XXXXXXX , XXXXXXX , XXXXXXX ,      KC_WH_L , KC_WH_D , KC_WH_U , KC_WH_R , XXXXXXX ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      XXXXXXX , _______ ,      KC_BTN2 , KC_BTN1
+                                      XXXXXXX , XXXXXXX ,      KC_BTN2 , KC_BTN1
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_MEDIA] = LAYOUT_split_3x5_2(
@@ -96,7 +112,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         XXXXXXX , KC_RALT , XXXXXXX , XXXXXXX , XXXXXXX ,      XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      _______ , _______ ,      KC_MSTP , KC_MPLY
+                                      XXXXXXX , XXXXXXX ,      KC_MSTP , KC_MPLY
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_NUM] = LAYOUT_split_3x5_2(
@@ -107,7 +123,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_GRV  , KC_1    , KC_2    , KC_3    , KC_BSLS ,      XXXXXXX , XXXXXXX , XXXXXXX , KC_RALT , XXXXXXX ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      KC_0    , KC_MINS ,      XXXXXXX , _______
+                                      KC_0    , KC_MINS ,      XXXXXXX , XXXXXXX
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_SYM] = LAYOUT_split_3x5_2(
@@ -118,7 +134,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_TILD , KC_EXLM , KC_AT   , KC_HASH , KC_PIPE ,      XXXXXXX , XXXXXXX , XXXXXXX , KC_RALT , XXXXXXX ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      KC_RPRN , KC_UNDS ,      _______ , XXXXXXX
+                                      KC_RPRN , KC_UNDS ,      XXXXXXX , XXXXXXX
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_FUN] = LAYOUT_split_3x5_2(
@@ -129,7 +145,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_F10  , KC_F1   , KC_F2   , KC_F3   , XXXXXXX ,      XXXXXXX , XXXXXXX , XXXXXXX , KC_RALT , XXXXXXX ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      XXXXXXX , XXXXXXX ,      _______ , _______
+                                      KC_SPC  , KC_TAB  ,      XXXXXXX , XXXXXXX
     //                              └─────────┴─────────┘    └─────────┴─────────┘
-    ),
+    )
 };
