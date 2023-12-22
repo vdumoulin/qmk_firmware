@@ -1,4 +1,16 @@
 // Vincent Dumoulin's Ferris Sweep keyboard layout.
+//
+// Reuses Miryoku (QWERTY, vi navigation) layout conventions with a few
+// simplifications and tweaks:
+//
+//   * No Button layer and no Extra and Tap alternate base layers.
+//   * Double-tap buttons are modified to have the following functionalities
+//     (index to pinkie, {left,right} hand): DM_PLY{1,2} (single-tap), DM_RSTP
+//     (single-tap), DM_REC{1,2} (single-tap), QK_REBOOT QK_BOOT.
+//   * No layer-lock additional functionality.
+//   * No RGB or bluetooth functionalities in the Media layer; the index and
+//     middle fingers in the top row control screen brightness instead.
+
 #include QMK_KEYBOARD_H
 
 enum layers {
@@ -68,6 +80,29 @@ combo_t key_combos[] = {
   [PAREN_COMBO] = COMBO(paren_combo, KC_LPRN)
 };
 
+/* Tap-dance */
+enum tap_dance {
+  TBO,
+  TRE
+};
+
+void td_fn_boot(tap_dance_state_t *state, void *user_data) {
+  if (state->count == 2) {
+    reset_keyboard();
+  }
+}
+
+void td_fn_reboot(tap_dance_state_t *state, void *user_data) {
+  if (state->count == 2) {
+    soft_reset_keyboard();
+  }
+}
+
+tap_dance_action_t tap_dance_actions[] = {
+  [TBO] = ACTION_TAP_DANCE_FN(td_fn_boot),
+  [TRE] = ACTION_TAP_DANCE_FN(td_fn_reboot),
+};
+
 /* Keymap */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x5_2(
@@ -84,7 +119,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_NAV] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX ,      KC_MRDO , KC_MPST , KC_MCPY , KC_MCUT , KC_MUND ,
+        TD(TBO) , TD(TRE) , DM_REC1 , DM_RSTP , DM_PLY1 ,      KC_MRDO , KC_MPST , KC_MCPY , KC_MCUT , KC_MUND ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_LGUI , KC_LALT , KC_LCTL , KC_LSFT , XXXXXXX ,      KC_LEFT , KC_DOWN , KC_UP   , KC_RGHT , CW_TOGG ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -95,7 +130,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_MOUSE] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX ,      KC_MRDO , KC_MPST , KC_MCPY , KC_MCUT , KC_MUND ,
+        TD(TBO) , TD(TRE) , DM_REC1 , DM_RSTP , DM_PLY1 ,      KC_MRDO , KC_MPST , KC_MCPY , KC_MCUT , KC_MUND ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_LGUI , KC_LALT , KC_LCTL , KC_LSFT , XXXXXXX ,      KC_MS_L , KC_MS_D , KC_MS_U , KC_MS_R , XXXXXXX ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -106,7 +141,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_MEDIA] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX ,      XXXXXXX , KC_BRIU , KC_BRID , XXXXXXX , XXXXXXX ,
+        TD(TBO) , TD(TRE) , DM_REC1 , DM_RSTP , DM_PLY1 ,      XXXXXXX , KC_BRIU , KC_BRID , XXXXXXX , XXXXXXX ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_LGUI , KC_LALT , KC_LCTL , KC_LSFT , XXXXXXX ,      KC_MPRV , KC_VOLD , KC_VOLU , KC_MNXT , XXXXXXX ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -117,7 +152,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_NUM] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        KC_LBRC , KC_7    , KC_8    , KC_9    , KC_RBRC ,      XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX ,
+        KC_LBRC , KC_7    , KC_8    , KC_9    , KC_RBRC ,      DM_REC2 , DM_RSTP , DM_PLY2 , TD(TRE) , TD(TBO) ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_SCLN , KC_4    , KC_5    , KC_6    , KC_EQL  ,      XXXXXXX , KC_LSFT , KC_LCTL , KC_LALT , KC_LGUI ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -128,7 +163,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_SYM] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        KC_LCBR , KC_AMPR , KC_ASTR , KC_LPRN , KC_RCBR ,      XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX ,
+        KC_LCBR , KC_AMPR , KC_ASTR , KC_LPRN , KC_RCBR ,      DM_REC2 , DM_RSTP , DM_PLY2 , TD(TRE) , TD(TBO) ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_COLN , KC_DLR  , KC_PERC , KC_CIRC , KC_PLUS ,      XXXXXXX , KC_LSFT , KC_LCTL , KC_LALT , KC_LGUI ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -139,7 +174,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_FUN] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        KC_F12  , KC_F7   , KC_F8   , KC_F9   , XXXXXXX ,      XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX , XXXXXXX ,
+        KC_F12  , KC_F7   , KC_F8   , KC_F9   , XXXXXXX ,      DM_REC2 , DM_RSTP , DM_PLY2 , TD(TRE) , TD(TBO) ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_F11  , KC_F4   , KC_F5   , KC_F6   , XXXXXXX ,      XXXXXXX , KC_LSFT , KC_LCTL , KC_LALT , KC_LGUI ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
