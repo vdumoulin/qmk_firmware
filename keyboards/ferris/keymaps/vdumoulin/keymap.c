@@ -2,104 +2,141 @@
 
 #include QMK_KEYBOARD_H
 
+#include "oneshot.h"
+#include "tapdances.h"
+
 enum layers {
-  _BASE,
-  _SYM,
-  _NUM,
-  _EXT,
+    _BASE,
+    _LOWER,
+    _RAISE,
+    _ADJUST,
 };
 
-/* Home row mods */
-#define _G_A LGUI_T(KC_A)
-#define _A_S LALT_T(KC_S)
-#define _C_D LCTL_T(KC_D)
-#define _S_F LSFT_T(KC_F)
-#define _S_J LSFT_T(KC_J)
-#define _C_K LCTL_T(KC_K)
-#define _A_L LALT_T(KC_L)
-#define _G_QUOT LGUI_T(KC_QUOT)
+#define LOWER MO(_LOWER)               // Momentarily toggle the _LOWER layer
+#define RAISE MO(_RAISE)               // Momentarily toggle the _RAISE layer
 
-/* One-shot mods */
-#define OS_LSFT OSM(MOD_LSFT)
-#define OS_LCTL OSM(MOD_LCTL)
-#define OS_LALT OSM(MOD_LALT)
-#define OS_LGUI OSM(MOD_LGUI)
-
-/* Layer toggling */
-#define OS_SYM OSL(_SYM)
-#define OS_NUM OSL(_NUM)
-
-/* Tap-dance */
-enum tap_dance {
-  TBO,
-  TRE
+enum keycodes {
+    OS_LSFT = SAFE_RANGE,
+    OS_LCTL,
+    OS_LALT,
+    OS_LGUI,
+    BSP_DEL                            // Backspace on tap, del when shifted
 };
 
-void td_fn_boot(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    reset_keyboard();
-  }
-}
+#define ENT_SFT LSFT_T(KC_ENT)         // Enter on tap, shift on hold
+#define SPC_SFT LSFT_T(KC_SPC)         // Space on tap, shift on hold
 
-void td_fn_reboot(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    soft_reset_keyboard();
-  }
-}
+#define P_SCR G(S(KC_5))               // Print screen on macOS (cmd-shift-5)
 
-tap_dance_action_t tap_dance_actions[] = {
-  [TBO] = ACTION_TAP_DANCE_FN(td_fn_boot),
-  [TRE] = ACTION_TAP_DANCE_FN(td_fn_reboot),
-};
+#define BOOT TD(TAP_DANCE_BOOTLOADER)  // Put keyboard in bootloader mode
+#define RESET TD(TAP_DANCE_RESET)      // Reset keyboard
 
-/* Keymap */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
         KC_Q    , KC_W    , KC_E    , KC_R    , KC_T    ,      KC_Y    , KC_U    , KC_I    , KC_O    , KC_P    ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        _G_A    , _A_S    , _C_D    , _S_F    , KC_G    ,      KC_H    , _S_J    , _C_K    , _A_L    , _G_QUOT ,
+        KC_A    , KC_S    , KC_D    , KC_F    , KC_G    ,      KC_H    , KC_J    , KC_K    , KC_L    , KC_QUOT ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_Z    , KC_X    , KC_C    , KC_V    , KC_B    ,      KC_N    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      OS_NUM  , KC_SPC  ,      OS_LSFT , OS_SYM
+                                      RAISE   , SPC_SFT ,      ENT_SFT , LOWER
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
-    [_SYM] = LAYOUT_split_3x5_2(
+    [_LOWER] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        KC_LPRN , KC_LBRC , KC_LCBR , KC_LABK , OS_LGUI ,      OS_LCTL , KC_RABK , KC_RCBR , KC_RBRC , KC_RPRN ,
+        KC_EXLM , KC_AT   , KC_HASH , KC_DLR  , KC_PERC ,      KC_CIRC , KC_AMPR , KC_ASTR , KC_LPRN , KC_RPRN ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_EXLM , KC_AT   , KC_HASH , KC_DLR  , KC_PERC ,      KC_CIRC , KC_AMPR , KC_ASTR , KC_BSLS , KC_SCLN ,
+        KC_LBRC , KC_RBRC , KC_MINS , KC_UNDS , KC_EQL  ,      KC_TAB  , OS_LSFT , OS_LCTL , OS_LALT , OS_LGUI ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_GRV  , KC_TILD , KC_PLUS , KC_UNDS , OS_LSFT ,      OS_LALT , KC_MINS , KC_EQL  , KC_PIPE , KC_COLN ,
+        KC_LABK , KC_RABK , KC_GRV  , KC_TILD , KC_PLUS ,      XXXXXXX , KC_COLN , KC_SCLN , KC_LCBR , KC_RCBR ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      _______ , _______ ,      _______ , _______
+                                      _______ , _______ ,      XXXXXXX , _______
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
-    [_NUM] = LAYOUT_split_3x5_2(
+    [_RAISE] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        KC_ESC  , KC_F7   , KC_F8   , KC_F9   , OS_LGUI ,      OS_LCTL , KC_7    , KC_8    , KC_9    , KC_BSPC ,
+        KC_1    , KC_2    , KC_3    , KC_4    , KC_5    ,      KC_6    , KC_7    , KC_8    , KC_9    , KC_0    ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_TAB  , KC_F4   , KC_F5   , KC_F6   , KC_F10  ,      KC_0    , KC_4    , KC_5    , KC_6    , KC_ENT  ,
+        OS_LGUI , OS_LALT , OS_LCTL , OS_LSFT , KC_SPC  ,      KC_LEFT , KC_DOWN , KC_UP   , KC_RGHT , KC_DQUO ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        CW_TOGG , KC_F1   , KC_F2   , KC_F3   , OS_LSFT ,      OS_LALT , KC_1    , KC_2    , KC_3    , KC_DEL  ,
+        KC_ESC  , BSP_DEL , KC_BSLS , KC_PIPE , XXXXXXX ,      KC_HOME , KC_PGDN , KC_PGUP , KC_END  , KC_QUES ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      _______ , _______ ,      _______ , _______
+                                      _______ , XXXXXXX ,      _______ , _______
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
-    [_EXT] = LAYOUT_split_3x5_2(
+    [_ADJUST] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        KC_VOLD , KC_VOLU , KC_MUTE , KC_F11  , KC_F12  ,      KC_MS_L , KC_MS_D , KC_MS_U , KC_MS_R , KC_BRIU ,
+        KC_F1   , KC_F2   , KC_F3   , KC_F4   , KC_F5   ,      KC_F6   , KC_F7   , KC_F8   , KC_F9   , KC_F10  ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        DM_RSTP , DM_PLY1 , DM_PLY2 , DM_REC1 , DM_REC2 ,      KC_LEFT , KC_DOWN , KC_UP   , KC_RGHT , KC_BRID ,
+        DM_PLY1 , DM_REC1 , DM_REC2 , DM_PLY2 , DM_RSTP ,      KC_MPRV , KC_BRID , KC_BRIU , KC_MNXT , KC_MPLY ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        TD(TRE) , KC_MPRV , KC_MNXT , KC_MSTP , KC_MPLY ,      KC_HOME , KC_PGDN , KC_PGUP , KC_END  , TD(TBO) ,
+        RESET   , P_SCR   , KC_F11  , KC_F12  , XXXXXXX ,      XXXXXXX , KC_VOLD , KC_VOLU , KC_MUTE , BOOT    ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      _______ , _______ ,      _______ , _______
+                                      _______ , XXXXXXX ,      XXXXXXX , _______
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
 };
 
+tap_dance_action_t tap_dance_actions[] = {
+    [TAP_DANCE_BOOTLOADER] = ACTION_TAP_DANCE_FN(td_fn_boot),
+    [TAP_DANCE_RESET] = ACTION_TAP_DANCE_FN(td_fn_reboot),
+};
+
+bool is_oneshot_cancel_key(uint16_t keycode) {
+    switch (keycode) {
+        case LOWER:
+        case RAISE:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool is_oneshot_ignored_key(uint16_t keycode) {
+    switch (keycode) {
+        case LOWER:
+        case RAISE:
+        case KC_LSFT:
+        case OS_LSFT:
+        case OS_LCTL:
+        case OS_LALT:
+        case OS_LGUI:
+            return true;
+        default:
+            return false;
+    }
+}
+
+oneshot_state os_shft_state = os_up_unqueued;
+oneshot_state os_ctrl_state = os_up_unqueued;
+oneshot_state os_alt_state  = os_up_unqueued;
+oneshot_state os_gui_state  = os_up_unqueued;
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    update_oneshot(&os_shft_state, KC_LSFT, OS_LSFT, keycode, record);
+    update_oneshot(&os_ctrl_state, KC_LCTL, OS_LCTL, keycode, record);
+    update_oneshot(&os_alt_state, KC_LALT, OS_LALT, keycode, record);
+    update_oneshot(&os_gui_state, KC_LGUI, OS_LGUI, keycode, record);
+
+    switch (keycode) {
+        case BSP_DEL:
+            if (record->event.pressed) {
+                if (get_mods() & MOD_BIT(KC_LSFT)) {
+                    register_code(KC_DEL);
+                } else {
+                    register_code(KC_BSPC);
+                }
+            } else {
+                unregister_code(KC_DEL);
+                unregister_code(KC_BSPC);
+            }
+            return false;
+        default:
+            return true;
+    }
+}
+
 layer_state_t layer_state_set_user(layer_state_t state) {
-   return update_tri_layer_state(state, _SYM, _NUM, _EXT);
+    return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
