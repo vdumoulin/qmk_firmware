@@ -20,7 +20,6 @@ enum keycodes {
     OS_LCTL,
     OS_LALT,
     OS_LGUI,
-    BSP_DEL                            // Backspace on tap, del when shifted
 };
 
 #define ENT_SFT LSFT_T(KC_ENT)         // Enter on tap, shift on hold
@@ -36,6 +35,7 @@ enum keycodes {
 #define HM_QUOT LGUI_T(KC_QUOT)
 
 #define P_SCR G(S(KC_5))               // Print screen on macOS (cmd-shift-5)
+#define ITERM C(KC_GRV)                // Toggle iTerm
 
 #define BOOT TD(TAP_DANCE_BOOTLOADER)  // Put keyboard in bootloader mode
 #define RESET TD(TAP_DANCE_RESET)      // Reset keyboard
@@ -49,16 +49,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_Z    , KC_X    , KC_C    , KC_V    , KC_B    ,      KC_N    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      RAISE   , SPC_SFT ,      ENT_SFT , LOWER
+                                      RAISE   , SPC_SFT ,      OS_LCTL , LOWER
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_LOWER] = LAYOUT_split_3x5_2(
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
         KC_EXLM , KC_AT   , KC_HASH , KC_DLR  , KC_PERC ,      KC_CIRC , KC_AMPR , KC_ASTR , KC_LPRN , KC_RPRN ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_LBRC , KC_RBRC , KC_MINS , KC_UNDS , KC_EQL  ,      KC_TAB  , OS_LSFT , OS_LCTL , OS_LALT , OS_LGUI ,
+        KC_LBRC , KC_RBRC , KC_MINS , KC_UNDS , KC_EQL  ,      ITERM   , OS_LSFT , OS_LCTL , OS_LALT , OS_LGUI ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_LABK , KC_RABK , KC_GRV  , KC_TILD , KC_PLUS ,      XXXXXXX , KC_COLN , KC_SCLN , KC_LCBR , KC_RCBR ,
+        KC_BSLS , KC_PIPE , KC_GRV  , KC_TILD , KC_PLUS ,      XXXXXXX , KC_COLN , KC_SCLN , KC_LCBR , KC_RCBR ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
                                       _______ , _______ ,      XXXXXXX , _______
     //                              └─────────┴─────────┘    └─────────┴─────────┘
@@ -67,9 +67,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
         KC_1    , KC_2    , KC_3    , KC_4    , KC_5    ,      KC_6    , KC_7    , KC_8    , KC_9    , KC_0    ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        OS_LGUI , OS_LALT , OS_LCTL , OS_LSFT , KC_SPC  ,      KC_LEFT , KC_DOWN , KC_UP   , KC_RGHT , KC_DQUO ,
+        OS_LGUI , OS_LALT , OS_LCTL , OS_LSFT , ITERM   ,      KC_LEFT , KC_DOWN , KC_UP   , KC_RGHT , KC_ENT  ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_ESC  , BSP_DEL , KC_BSLS , KC_PIPE , XXXXXXX ,      KC_HOME , KC_PGDN , KC_PGUP , KC_END  , KC_QUES ,
+        KC_DEL  , KC_BSPC , KC_SPC  , KC_TAB  , XXXXXXX ,      KC_HOME , KC_PGDN , KC_PGUP , KC_END  , KC_ESC  ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
                                       _______ , XXXXXXX ,      _______ , _______
     //                              └─────────┴─────────┘    └─────────┴─────────┘
@@ -128,22 +128,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     update_oneshot(&os_alt_state, KC_LALT, OS_LALT, keycode, record);
     update_oneshot(&os_gui_state, KC_LGUI, OS_LGUI, keycode, record);
 
-    switch (keycode) {
-        case BSP_DEL:
-            if (record->event.pressed) {
-                if (get_mods() & MOD_BIT(KC_LSFT)) {
-                    register_code(KC_DEL);
-                } else {
-                    register_code(KC_BSPC);
-                }
-            } else {
-                unregister_code(KC_DEL);
-                unregister_code(KC_BSPC);
-            }
-            return false;
-        default:
-            return true;
-    }
+    return true;
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
