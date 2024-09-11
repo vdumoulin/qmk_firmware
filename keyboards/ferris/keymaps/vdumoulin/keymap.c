@@ -1,4 +1,8 @@
 // Vincent Dumoulin's Ferris Sweep keyboard layout.
+// To flash to a sea-picro MCU:
+//
+//     qmk flash -kb ferris/sweep -km vdumoulin -bl uf2-split-{left,right} \
+//               -e CONVERT_TO=sparkfun_pm2040
 
 #include QMK_KEYBOARD_H
 
