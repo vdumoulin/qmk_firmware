@@ -1,5 +1,5 @@
 #pragma once
 
 #define EE_HANDS
-#define FORCE_NKRO
+#define NKRO_DEFAULT_ON true
 #define PERMISSIVE_HOLD
