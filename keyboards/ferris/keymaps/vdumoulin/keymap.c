@@ -26,8 +26,7 @@ enum keycodes {
     ZS_LGUI,
 };
 
-#define ENT_SFT LSFT_T(KC_ENT)         // Enter on tap, shift on hold
-#define SPC_SFT LSFT_T(KC_SPC)         // Space on tap, shift on hold
+#define SPC_CTL LCTL_T(KC_SPC)          // Space on tap, shift on hold
 
 #define P_SCR G(S(KC_5))               // Print screen on macOS (cmd-shift-5)
 #define ITERM C(KC_GRV)                // Toggle iTerm
@@ -41,7 +40,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_Z    , KC_X    , KC_C    , KC_V    , KC_B    ,      KC_N    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      RAISE   , SPC_SFT ,      ZS_LCTL , LOWER
+                                      RAISE   , SPC_CTL ,      KC_LSFT , LOWER
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_LOWER] = LAYOUT_split_3x5_2(
