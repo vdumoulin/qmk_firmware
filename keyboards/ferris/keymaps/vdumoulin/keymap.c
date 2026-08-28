@@ -1,9 +1,9 @@
 /* Vincent Dumoulin's Ferris Sweep keyboard layout.
-// To flash to a sea-picro MCU:
-//
-//     qmk flash -kb ferris/sweep -km vdumoulin -bl uf2-split-{left,right} \
-//               -e CONVERT_TO=sparkfun_pm2040
-*/
+ * To flash to a sea-picro MCU:
+ *
+ *     qmk flash -kb ferris/sweep -km vdumoulin -bl uf2-split-{left,right} \
+ *               -e CONVERT_TO=sparkfun_pm2040
+ */
 
 #include QMK_KEYBOARD_H
 
@@ -26,7 +26,7 @@ enum keycodes {
     ZS_LGUI,
 };
 
-#define SPC_CTL LCTL_T(KC_SPC)          // Space on tap, shift on hold
+#define SPC_CTL LCTL_T(KC_SPC)          // Space on tap, control on hold
 
 #define P_SCR G(S(KC_5))               // Print screen on macOS (cmd-shift-5)
 #define ITERM C(KC_GRV)                // Toggle iTerm
