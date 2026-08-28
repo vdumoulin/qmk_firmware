@@ -1,5 +1,6 @@
 DYNAMIC_MACRO_ENABLE = yes
 EXTRAKEY_ENABLE = yes
 NKRO_ENABLE = yes
+LTO_ENABLE = yes
 
 SRC += oneshot.c
