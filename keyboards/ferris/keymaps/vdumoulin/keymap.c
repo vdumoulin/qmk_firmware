@@ -26,8 +26,7 @@ enum keycodes {
     ZS_LGUI,
 };
 
-#define D_CTL LCTL_T(KC_D)              // Character d on tap, control on hold
-#define K_CTL LCTL_T(KC_K)              // Character k on tap, control on hold
+#define SPC_CTL LCTL_T(KC_SPC)          // Space on tap, control on hold
 
 #define P_SCR G(S(KC_5))               // Print screen on macOS (cmd-shift-5)
 #define ITERM C(KC_GRV)                // Toggle iTerm
@@ -37,11 +36,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //┌─────────┬─────────┬─────────┬─────────┬─────────┐    ┌─────────┬─────────┬─────────┬─────────┬─────────┐
         KC_Q    , KC_W    , KC_E    , KC_R    , KC_T    ,      KC_Y    , KC_U    , KC_I    , KC_O    , KC_P    ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_A    , KC_S    , D_CTL   , KC_F    , KC_G    ,      KC_H    , KC_J    , K_CTL   , KC_L    , KC_QUOT ,
+        KC_A    , KC_S    , KC_D    , KC_F    , KC_G    ,      KC_H    , KC_J    , KC_K    , KC_L    , KC_QUOT ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         KC_Z    , KC_X    , KC_C    , KC_V    , KC_B    ,      KC_N    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
-                                      RAISE   , KC_SPC  ,      KC_LSFT , LOWER
+                                      RAISE   , SPC_CTL ,      KC_LSFT , LOWER
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
     [_LOWER] = LAYOUT_split_3x5_2(
@@ -78,6 +77,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //                              └─────────┴─────────┘    └─────────┴─────────┘
     ),
 };
+
+// Thumb keys (row 3 on the left half, row 7 on the right) are exempt from
+// Chordal Hold's opposite-hands rule, since SPC_CTL needs to chord with
+// same-hand hotkeys like ctrl-c/v/x/z/a/s.
+char chordal_hold_handedness(keypos_t key) {
+    if (key.row == 3 || key.row == 7) {
+        return '*';
+    }
+    return key.row < 4 ? 'L' : 'R';
+}
 
 bool is_oneshot_cancel_key(uint16_t keycode) {
     switch (keycode) {
