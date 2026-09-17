@@ -1,9 +1,11 @@
 #pragma once
 
 
+#define CHORDAL_HOLD
 #define EE_HANDS
+#define FLOW_TAP_TERM 150
 #define NKRO_DEFAULT_ON true
-#define PERMISSIVE_HOLD
-#define TAPPING_TERM 150
-#define SPLIT_WATCHDOG_ENABLE
+#define HOLD_ON_OTHER_KEY_PRESS
 #define SPLIT_USB_TIMEOUT 500
+#define SPLIT_WATCHDOG_ENABLE
+#define TAPPING_TERM 150
