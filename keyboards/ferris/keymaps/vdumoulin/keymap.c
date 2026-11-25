@@ -24,6 +24,7 @@ enum keycodes {
     ZS_LCTL,
     ZS_LALT,
     ZS_LGUI,
+    GLOBE,                             // macOS Globe key (switch input source)
 };
 
 #define SPC_CTL LCTL_T(KC_SPC)          // Space on tap, control on hold
@@ -71,7 +72,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
         DM_PLY1 , DM_REC1 , DM_REC2 , DM_PLY2 , DM_RSTP ,      KC_MPRV , KC_BRID , KC_BRIU , KC_MNXT , KC_MPLY ,
     //├─────────┼─────────┼─────────┼─────────┼─────────┤    ├─────────┼─────────┼─────────┼─────────┼─────────┤
-        KC_NO   , P_SCR   , KC_F11  , KC_F12  , XXXXXXX ,      XXXXXXX , KC_VOLD , KC_VOLU , KC_MUTE , KC_NO   ,
+        KC_NO   , P_SCR   , KC_F11  , KC_F12  , XXXXXXX ,      XXXXXXX , KC_VOLD , KC_VOLU , KC_MUTE , GLOBE   ,
     //└─────────┴─────────┴─────────┼─────────┼─────────┤    ├─────────┼─────────┴─────────┴─────────┴─────────┘
                                       _______ , XXXXXXX ,      XXXXXXX , _______
     //                              └─────────┴─────────┘    └─────────┴─────────┘
@@ -123,6 +124,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     update_oneshot(&os_ctrl_state, KC_LCTL, ZS_LCTL, keycode, record);
     update_oneshot(&os_alt_state, KC_LALT, ZS_LALT, keycode, record);
     update_oneshot(&os_gui_state, KC_LGUI, ZS_LGUI, keycode, record);
+
+    switch (keycode) {
+        case GLOBE:
+            // QMK has no built-in keycode for this consumer usage, which macOS
+            // treats like the Globe key (requires EXTRAKEY_ENABLE).
+            host_consumer_send(record->event.pressed ? AC_NEXT_KEYBOARD_LAYOUT_SELECT : 0);
+            return false;
+    }
 
     return true;
 }
